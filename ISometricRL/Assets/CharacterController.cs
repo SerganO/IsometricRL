@@ -7,6 +7,7 @@ public class CharacterController : MonoBehaviour
 {
     public float moveSpeed = 5f;
     private Animator animator;
+    private Rigidbody2D rbody;
 
     public bool isAttacking = false;
 
@@ -28,6 +29,7 @@ public class CharacterController : MonoBehaviour
     {
         // Get the Animator component attached to the GameObject
         animator = GetComponent<Animator>();
+        rbody = GetComponent<Rigidbody2D>();
     }
 
     void Update()
@@ -48,7 +50,8 @@ public class CharacterController : MonoBehaviour
         {
             SetCurrentDirection(movement.x, movement.y);
             Vector3 newPosition = transform.position + movement * moveSpeed * Time.deltaTime;
-            transform.position = newPosition;
+            rbody.MovePosition(newPosition);
+            //transform.position = newPosition;
             PlayRunAnimation();
         }
         else
