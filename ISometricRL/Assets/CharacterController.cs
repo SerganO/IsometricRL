@@ -41,7 +41,7 @@ public class CharacterController : Entity
         {
             SetCurrentDirection(movement.x, movement.y);
             Vector3 newPosition = transform.position + movement * moveSpeed * Time.deltaTime;
-            rbody.MovePosition(newPosition);
+            transform.position = newPosition;
             PlayRunAnimation();
         }
         else

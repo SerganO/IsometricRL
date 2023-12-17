@@ -428,7 +428,7 @@ MonoBehaviour:
   actionEnabled: 1
   isAttacking: 0
   isHurting: 0
-  moveSpeed: 5
+  moveSpeed: 2
 --- !u!50 &5155449956685114741
 Rigidbody2D:
   serializedVersion: 4
