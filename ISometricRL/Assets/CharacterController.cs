@@ -15,13 +15,22 @@ public class CharacterController : Entity
 
     void Update()
     {
+        GetComponent<Rigidbody2D>().WakeUp();
+        if (attackCountDown > 0)
+        {
+            attackCountDown -= Time.deltaTime;
+        }
+        else
+        {
+            attackCountDown = 0;
+        }
         HandleMouseClick();
         HandleMovementInput();
     }
 
     void HandleMovementInput()
     {
-        if (isAttacking) return;
+        if (moveDisabled) return;
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
 
@@ -44,9 +53,14 @@ public class CharacterController : Entity
     {
         if (Input.GetMouseButtonDown(0))
         {
-            if (isAttacking) return;
+            if (isHurting || isAttacking || attackCountDown > 0) return;
             PlayAttackAnimation();
         }
+    }
+
+    public override void onDeath()
+    {
+       
     }
 
 }

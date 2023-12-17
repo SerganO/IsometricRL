@@ -10,6 +10,9 @@ public class EnemyController : Entity
     public Transform goal;
     NavMeshAgent agent;
 
+    public float VisionRadius = 5.0f;
+    public bool goalSetted = false;
+
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -17,17 +20,33 @@ public class EnemyController : Entity
         agent.updateRotation = false;
         transform.rotation = new Quaternion();
         transform.position = new Vector3(transform.position.x, transform.position.y, 0);
-
-        goal = GameObject.FindGameObjectWithTag("Player").transform;
-        agent.destination = goal.position;
     }
 
     private void Update()
     {
+        GetComponent<Rigidbody2D>().WakeUp();
+        if (attackCountDown > 0)
+        {
+            attackCountDown -= Time.deltaTime;
+        }
+        else
+        {
+            attackCountDown = 0;
+        }
+        agent.isStopped = moveDisabled;
+        if (moveDisabled || !actionEnabled) return;
         goal = GameObject.FindGameObjectWithTag("Player").transform;
-        agent.destination = goal.position;
+        if(goalSetted || Vector2.Distance(transform.position, goal.position) <= VisionRadius)
+        {
+            goalSetted = true;
+            agent.destination = goal.position;
+        } else
+        {
+            PlayIdleAnimation();
+            return;
+        }
+       
         var a = agent.path.corners[agent.path.corners.Length - 1];
-        var angle = Vector2.Angle(transform.position,a);
         var x = a.x - transform.position.x;
         if(Mathf.Abs(x) < 0.05)
         {
@@ -48,6 +67,16 @@ public class EnemyController : Entity
         } else
         {
             PlayIdleAnimation();
+            if(Vector2.Distance(transform.position, goal.position) < 0.5)
+            {
+                if (!isHurting && !isAttacking && attackCountDown <= 0)
+                {
+                    PlayAttackAnimation();
+                }
+                  
+
+            }
+           
         }
 
        

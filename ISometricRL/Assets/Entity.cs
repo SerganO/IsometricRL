@@ -17,8 +17,16 @@ public class Entity : MonoBehaviour
     }
     protected Animator animator;
     public Direction direction = Direction.Down;
+    public Transform Attacks;
+    public float attackCountDown = 0;
 
+    public int HitPoint = 10;
+
+
+    public bool moveDisabled = false;
+    public bool actionEnabled = true;
     public bool isAttacking = false;
+    public bool isHurting = false;
 
     void Awake()
     {
@@ -27,19 +35,76 @@ public class Entity : MonoBehaviour
 
     void OnAttackAnimationStart()
     {
+        moveDisabled = true;
         isAttacking = true;
+        Attacks.GetChild((int)direction).gameObject.SetActive(true);
     }
 
     void onAttackAnimationEnd()
     {
+        moveDisabled = false;
         isAttacking = false;
+        Attacks.GetChild((int)direction).gameObject.SetActive(false);
+        attackCountDown = Attacks.GetChild((int)direction).GetComponentInParent<Attack>().countdown;
     }
 
-  
+    void OnGotHitAnimationStart()
+    {
+        isHurting = true;
+        isAttacking = false;
+        moveDisabled = true;
+    }
+
+    void onGotHitAnimationEnd()
+    {
+        isHurting = false;
+        moveDisabled = false;
+    }
+
+    public void Hurt(int damage)
+    {
+        HitPoint -= damage;
+        if(HitPoint <= 0)
+        {
+            Death();
+            return;
+        }
+        PlayHurtAnimation();
+    }
+
+    void Death()
+    {
+        moveDisabled = true;
+        actionEnabled = false;
+        PlayDeathAnimation();
+        
+    }
+
+    public virtual void onDeath()
+    {
+        Destroy(this.gameObject);
+    }
+
+    public void onDeathAnimationEnd()
+    {
+        onDeath();
+    }
+
+    protected void PlayDeathAnimation()
+    {
+        animator.Play("Death_" + (int)direction);
+    }
+
     protected void PlayRunAnimation()
     {
         animator.Play("Run_" + (int)direction);
     }
+
+    protected void PlayHurtAnimation()
+    {
+        animator.Play("GotHit_" + (int)direction);
+    }
+
 
     protected void PlayIdleAnimation()
     {
@@ -48,7 +113,6 @@ public class Entity : MonoBehaviour
 
     protected void PlayAttackAnimation()
     {
-
         animator.Play("Attack_" + (int)direction);
     }
 
